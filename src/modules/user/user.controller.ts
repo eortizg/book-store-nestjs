@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -29,7 +28,7 @@ export class UserController {
   }
 
   @Post()
-  async createUser(@Body() user: User): Promise<UserDto> {
+  async createUser(@Body() user: User): Promise<User> {
     const createdUser = await this._userService.create(user);
     return createdUser;
   }

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MapperService } from './mapper.service';
 
 @Module({
   controllers: [],
-  providers: [MapperService],
-  imports: [MapperService],
-  exports: [MapperService],
+  providers: [],
+  imports: [],
+  exports: [],
 })
 export class SharedModule {}
