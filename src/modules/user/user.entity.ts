@@ -37,7 +37,7 @@ export class User extends BaseEntity {
   details: UserDetails;
 
   // eslint-disable-next-line prettier/prettier
-  @ManyToMany( type => Role, role => role.users)
+  @ManyToMany( type => Role, role => role.users,  { eager: true })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 

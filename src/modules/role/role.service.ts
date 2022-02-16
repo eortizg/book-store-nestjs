@@ -11,7 +11,7 @@ import { RoleRepository } from './role.repository';
 export class RoleService {
   constructor(
     @InjectRepository(RoleRepository)
-    private readonly _roleRepository: RoleRepository
+    private readonly _roleRepository: RoleRepository,
   ) {}
 
   async get(id: number): Promise<Role> {
