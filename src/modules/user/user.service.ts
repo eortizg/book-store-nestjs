@@ -11,6 +11,8 @@ import { RoleRepository } from '../role/role.repository';
 import { UserDetails } from './user.details.entity';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
+import { ReadUserDto, UpdateUserDto } from './dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -21,7 +23,7 @@ export class UserService {
     private readonly _roleRepository: RoleRepository,
   ) {}
 
-  async get(id: number): Promise<User> {
+  async get(id: number): Promise<ReadUserDto> {
     if (!id) {
       throw new BadRequestException('id must be send');
     }
@@ -33,17 +35,18 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    return user;
+    return plainToClass(ReadUserDto, user);
   }
 
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<ReadUserDto[]> {
     const users = await this._userRepository.find({
       where: { status: status.ACTIVE },
     });
 
-    return users;
+    return users.map((user: User) => plainToClass(ReadUserDto, user));
   }
 
+  /*
   async create(user: User): Promise<User> {
     const details = new UserDetails();
     user.details = details;
@@ -52,10 +55,18 @@ export class UserService {
     user.roles = [defaultRole];
     const savedUser = await this._userRepository.save(user);
     return savedUser;
-  }
+  }*/
 
-  async update(id: number, user: User): Promise<void> {
-    await this._userRepository.update(id, user);
+  async update(id: number, user: UpdateUserDto): Promise<ReadUserDto> {
+    const foundUser = await this._userRepository.findOne(id, {
+      where: { status: 'ACTIVE' },
+    });
+    if (!foundUser) throw new NotFoundException('User does not exits');
+
+    foundUser.username = user.username;
+
+    const updatedUser = this._userRepository.save(foundUser);
+    return plainToClass(ReadUserDto, updatedUser);
   }
 
   async delete(id: number): Promise<void> {
@@ -68,7 +79,7 @@ export class UserService {
     await this._userRepository.update(id, { status: status.INACTIVE });
   }
 
-  async setRoleToUser(userId: number, roleId: number) {
+  async setRoleToUser(userId: number, roleId: number): Promise<boolean> {
     const userExists = await this._userRepository.findOne(userId, {
       where: { status: status.ACTIVE },
     });
